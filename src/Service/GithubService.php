@@ -10,10 +10,11 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GithubService
 {
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(private HttpClientInterface $httpClient, private LoggerInterface $logger)
     {
 
     }
@@ -29,9 +30,10 @@ class GithubService
         $health = HealthStatus::HEALTHY;
 
         // we need to call the GitHub API
-        $client = HttpClient::create();
+        //$client = HttpClient::create();
 
-        $response = $client->request(
+        // dependency injection we don't need the static client anymore
+        $response = $this->httpClient->request(
             method: 'GET',
             url: 'https://api.github.com/repos/SymfonyCasts/dino-park/issues'
         );
