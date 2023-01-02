@@ -39,7 +39,9 @@ class GithubServiceTest extends TestCase
         ;
 
         $mockHttpClient
+            ->expects(self::once()) // the method is called exactly once
             ->method('request')
+            ->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
             ->willReturn($mockResponse)
         ;
 
@@ -47,6 +49,7 @@ class GithubServiceTest extends TestCase
         //$service = new GithubService(HttpClient::create(), $mockLogger);
         self::assertSame($expectedStatus, $service->getHealthReport($dinoName));
     }
+
     public function dinoNameProvider(): \Generator
     {
         yield 'Sick Dino' => [
