@@ -62,4 +62,38 @@ class GithubServiceTest extends TestCase
         ];
     }
 
+    public function testExceptionThrownWithUnknownLabel(): void
+    {
+        // this allows us to pass in a class or interface and get back a "fake" instance of that class or interface
+        $mockLogger = $this->createMock(LoggerInterface::class);
+        // Mocking the HttpClient
+        $mockHttpClient = $this->createMock(HttpClientInterface::class);
+        // Mocking the response
+        $mockResponse = $this->createMock(ResponseInterface::class);
+
+        $mockResponse
+            ->method('toArray')
+            ->willReturn([
+                [
+                    'title' => 'Maverick',
+                    'labels' => [['name' => 'Status: Drowsy']],
+                ],
+            ])
+        ;
+
+        $mockHttpClient
+            ->expects(self::once()) // the method is called exactly once
+            ->method('request')
+            ->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
+            ->willReturn($mockResponse)
+        ;
+
+        $service = new GithubService($mockHttpClient, $mockLogger);
+        //$service = new GithubService(HttpClient::create(), $mockLogger);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Drowsy is an unknown status label!');
+
+        $service->getHealthReport('Maverick');
+    }
+
 }

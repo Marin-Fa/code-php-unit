@@ -56,6 +56,7 @@ class GithubService
     private function getDinoStatusFromLabels(array $labels): HealthStatus
     {
         $status = null;
+        dump($labels);
         foreach ($labels as $label) {
             $label = $label['name'];
             // We only care about "Status" labels
@@ -64,7 +65,15 @@ class GithubService
             }
             // Remove the "Status:" and whitespace from the label
             $status = trim(substr($label, strlen('Status:')));
+
+            $health = HealthStatus::tryFrom($status);
+
+            // Determine if we know about the label - throw an exception if we don't
+            if ($health === null) {
+                throw new \RuntimeException(sprintf('%s is an unknown status label!', $label));
+            }
         }
-        return HealthStatus::tryFrom($status);
+
+       return $health ?? HealthStatus::HEALTHY;
     }
 }
