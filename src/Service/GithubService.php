@@ -56,7 +56,7 @@ class GithubService
     private function getDinoStatusFromLabels(array $labels): HealthStatus
     {
         $status = null;
-        dump($labels);
+        //dump($labels);
         foreach ($labels as $label) {
             $label = $label['name'];
             // We only care about "Status" labels
